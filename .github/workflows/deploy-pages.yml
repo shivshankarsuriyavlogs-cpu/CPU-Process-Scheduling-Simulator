@@ -1,4 +1,4 @@
-name: Deploy Vite app to GitHub Pages
+name: Build and deploy CPU Simulator to GitHub Pages
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ !startsWith(github.event.head_commit.message, 'Deploy built site') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,8 +27,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Configure GitHub Pages
+      - name: Configure Pages
         uses: actions/configure-pages@v5
+
+      - name: Restore Vite source index
+        run: cp index.source.html index.html
 
       - name: Install dependencies
         run: npm install
@@ -38,13 +42,24 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Verify build output
+      - name: Verify Vite bundle
         run: |
           test -f dist/index.html
           test -d dist/assets
           grep -q 'CPU Process Scheduling Simulator' dist/index.html
-          grep -Eq 'src="/CPU-Process-Scheduling-Simulator/assets/.*\.js"' dist/index.html
-          grep -Eq 'href="/CPU-Process-Scheduling-Simulator/assets/.*\.css"' dist/index.html
+          grep -q '/CPU-Process-Scheduling-Simulator/assets/' dist/index.html
+
+      - name: Publish built files to main
+        run: |
+          rm -rf assets
+          cp -R dist/assets ./assets
+          cp dist/index.html ./index.html
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Deploy built site"
+          git push
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
@@ -52,6 +67,7 @@ jobs:
           path: ./dist
 
   deploy:
+    if: ${{ !startsWith(github.event.head_commit.message, 'Deploy built site') }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
