@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Type check
+        run: npm run lint
+
       - name: Build
         run: npm run build
 
@@ -40,6 +43,8 @@ jobs:
           test -f dist/index.html
           test -d dist/assets
           grep -q 'CPU Process Scheduling Simulator' dist/index.html
+          grep -Eq 'src="/CPU-Process-Scheduling-Simulator/assets/.*\.js"' dist/index.html
+          grep -Eq 'href="/CPU-Process-Scheduling-Simulator/assets/.*\.css"' dist/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
