@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: '/CPU-Process-Scheduling-Simulator/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
