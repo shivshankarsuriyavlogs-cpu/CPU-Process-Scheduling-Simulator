@@ -128,16 +128,24 @@ export default function App() {
       return;
     }
 
-    setValidationError(null);
-    const result = runSimulation(procsToRun, algToRun, qToRun, pDirToRun);
-    setSimulationResult(result);
+    try {
+      setValidationError(null);
+      const result = runSimulation(procsToRun, algToRun, qToRun, pDirToRun);
+      const compResults = runAllAlgorithms(procsToRun, qToRun, pDirToRun);
 
-    // Also update comparison data automatically
-    const compResults = runAllAlgorithms(procsToRun, qToRun, pDirToRun);
-    setComparisonData(compResults);
-
-    // Save to history
-    saveToHistory(result, procsToRun);
+      setSimulationResult(result);
+      setComparisonData(compResults);
+      saveToHistory(result, procsToRun);
+    } catch (error) {
+      console.error('Simulation failed:', error);
+      setSimulationResult(null);
+      setComparisonData(null);
+      setValidationError(
+        error instanceof Error
+          ? `Simulation error: ${error.message}`
+          : 'Simulation failed. Please check the process inputs and try again.',
+      );
+    }
 
     if (shouldScroll) {
       setTimeout(() => {
@@ -149,10 +157,14 @@ export default function App() {
     }
   }, [processes, algorithm, timeQuantum, priorityDirection, saveToHistory]);
 
-  // Initial simulation run on load
+  // Initial simulation is intentionally deferred until the first browser paint.
+  // This prevents a scheduler/runtime exception from ever producing a blank page.
   useEffect(() => {
-    handleRunSimulation();
-  }, []); // Run once on initial load
+    const timer = window.setTimeout(() => {
+      handleRunSimulation();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [handleRunSimulation]);
 
   // Compare All button handler
   const handleCompareAll = () => {
