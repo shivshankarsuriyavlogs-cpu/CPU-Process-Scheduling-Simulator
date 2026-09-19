@@ -1,0 +1,6 @@
+{
+  "name": "CPU Process Scheduling Simulator",
+  "description": "Interactive educational CPU scheduling simulator for Operating Systems students to visualize FCFS, SJF, SRTF, Priority, and Round Robin algorithms with dynamic Gantt charts, metrics, and comparisons.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
