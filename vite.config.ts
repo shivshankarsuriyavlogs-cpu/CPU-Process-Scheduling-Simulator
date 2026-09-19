@@ -3,10 +3,8 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
 
-export default defineConfig(() => ({
-  // Relative asset URLs make the Vite build work reliably on
-  // https://<user>.github.io/<repository>/ as well as locally.
-  base: './',
+export default defineConfig({
+  base: '/CPU-Process-Scheduling-Simulator/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -17,4 +15,4 @@ export default defineConfig(() => ({
     hmr: process.env.DISABLE_HMR !== 'true',
     watch: process.env.DISABLE_HMR === 'true' ? null : {},
   },
-}));
+});
