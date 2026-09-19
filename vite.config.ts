@@ -4,7 +4,9 @@ import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './',
+  // GitHub Pages serves this project from /CPU-Process-Scheduling-Simulator/
+  // Use an absolute base so JS/CSS assets always resolve correctly.
+  base: '/CPU-Process-Scheduling-Simulator/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
